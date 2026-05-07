@@ -4,6 +4,11 @@ import pandas as pd
 import joblib
 import os
 from contextlib import asynccontextmanager
+from fastapi.responses import FileResponse
+
+@app.get("/")
+async def read_index():
+    return FileResponse('index.html')
 
 cache = {
     "predictions": None,
