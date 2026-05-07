@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REST API Tester - Forecasting</title>
+    <style>
+        body { font-family: Consolas, monospace; background: #1e1e1e; color: #d4d4d4; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #252526; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        h1 { color: #569cd6; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .endpoint { margin-bottom: 20px; background: #2d2d30; padding: 15px; border-left: 4px solid #4CAF50; border-radius: 4px; }
+        .method-badge { background: #4CAF50; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; margin-right: 10px;}
+        input[type="text"] { padding: 10px; font-family: monospace; background: #3c3c3c; border: 1px solid #555; color: white; width: 250px; }
+        button { padding: 10px 15px; font-family: monospace; background: #007acc; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #0098ff; }
+        pre { background: #1e1e1e; padding: 15px; overflow-x: auto; border: 1px solid #333; border-radius: 4px; color: #9cdcfe; }
+        .key { color: #9cdcfe; }
+        .string { color: #ce9178; }
+        .number { color: #b5cea8; }
+        .boolean { color: #569cd6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Forecasting REST API Console</h1>
+        <p>A simple HTML client to test the API endpoints and view the raw JSON predictions.</p>
+
+        <div class="endpoint">
+            <h3><span class="method-badge">GET</span> /states</h3>
+            <p>Returns a list of all states available in the prediction registry.</p>
+            <button onclick="testStates()">Send Request</button>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method-badge">GET</span> /forecast/{state}</h3>
+            <p>Returns the 8-week forecasted predictions for a specific state.</p>
+            <input type="text" id="stateInput" placeholder="Enter state (e.g., Texas)" value="Texas">
+            <button onclick="testForecast()">Send Request</button>
+        </div>
+
+        <div>
+            <h3 style="color: #c586c0;">Request Execution:</h3>
+            <pre id="requestUrl">No request sent yet...</pre>
+            
+            <h3 style="color: #c586c0;">Raw JSON Response:</h3>
+            <pre id="jsonOutput">Results will appear here...</pre>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8000";
+
+        // Syntax highlighting for JSON
+        function syntaxHighlight(json) {
+            if (typeof json != "string") {
+                json = JSON.stringify(json, undefined, 2);
+            }
+            json = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = "number";
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = "key";
+                    } else {
+                        cls = "string";
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = "boolean";
+                } else if (/null/.test(match)) {
+                    cls = "null";
+                }
+                return "<span class=\"" + cls + "\">" + match + "</span>";
+            });
+        }
+
+        async function testStates() {
+            const url = API_BASE + "/states";
+            document.getElementById("requestUrl").innerText = "GET " + url;
+            document.getElementById("jsonOutput").innerText = "Fetching...";
+            
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                document.getElementById("jsonOutput").innerHTML = syntaxHighlight(data);
+            } catch (err) {
+                document.getElementById("jsonOutput").innerText = "Error: " + err.message + "\n(Make sure uvicorn is running!)";
+            }
+        }
+
+        async function testForecast() {
+            const state = document.getElementById("stateInput").value;
+            if (!state) return;
+            
+            const url = API_BASE + "/forecast/" + encodeURIComponent(state);
+            document.getElementById("requestUrl").innerText = "GET " + url;
+            document.getElementById("jsonOutput").innerText = "Fetching...";
+            
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                document.getElementById("jsonOutput").innerHTML = syntaxHighlight(data);
+            } catch (err) {
+                document.getElementById("jsonOutput").innerText = "Error: " + err.message + "\n(Make sure uvicorn is running!)";
+            }
+        }
+    </script>
+</body>
+</html>
