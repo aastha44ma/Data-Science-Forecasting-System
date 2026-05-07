@@ -6,18 +6,12 @@ import os
 from contextlib import asynccontextmanager
 from fastapi.responses import FileResponse
 
-@app.get("/")
-async def read_index():
-    return FileResponse('index.html')
-
-cache = {
-    "predictions": None,
-    "registry": None
-}
-
+# 1. Define the cache and paths
+cache = {"predictions": None, "registry": None}
 PREDICTIONS_PATH = 'future_predictions.csv'
 MODELS_REGISTRY_PATH = 'best_models_registry.pkl'
 
+# 2. Define the lifespan (Logic for loading data)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if os.path.exists(PREDICTIONS_PATH):
@@ -27,9 +21,9 @@ async def lifespan(app: FastAPI):
     yield
     cache.clear()
 
+# 3. Initialize the app WITH the lifespan
 app = FastAPI(
-    title="Sales Forecasting API", 
-    description="Ultra-lightweight backend service exposing 8-Week State Sales Forecasts.",
+    title="Sales Forecasting API",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -42,13 +36,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 4. NOW define your routes
 @app.get("/")
-def read_root():
-    return {
-        "status": "Online",
-        "message": "Welcome to the State Sales Forecasting API.",
-        "usage": "Send a GET request to /forecast/{state_name} to view projections."
-    }
+async def read_index():
+    return FileResponse('index.html')
 
 @app.get("/states")
 def get_supported_states():
@@ -60,21 +51,17 @@ def get_supported_states():
 def get_state_forecast(state: str):
     if cache["predictions"] is None:
         raise HTTPException(status_code=500, detail="Server hasn't loaded prediction data properly.")
-
+    
     predictions_df = cache["predictions"]
     states = predictions_df.columns.tolist()
-
     matched_state = next((s for s in states if s.lower() == state.lower()), None)
-
+    
     if not matched_state:
-        raise HTTPException(
-            status_code=404, 
-            detail=f"State '{state}' not found. Verify the state name by calling the /states directory."
-        )
-
+        raise HTTPException(status_code=404, detail=f"State '{state}' not found.")
+    
     forecast_data = predictions_df[matched_state].to_dict()
     model_used = cache["registry"].get(matched_state, "Unknown") if cache["registry"] else "Unknown"
-
+    
     return {
         "state": matched_state,
         "best_model_algorithm_selected": model_used,
