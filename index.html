@@ -46,10 +46,7 @@
             <pre id="jsonOutput">Results will appear here...</pre>
         </div>
     </div>
-
-    <script>
-        const API_BASE = "http://127.0.0.1:8000";
-
+<script>
         // Syntax highlighting for JSON
         function syntaxHighlight(json) {
             if (typeof json != "string") {
@@ -74,7 +71,8 @@
         }
 
         async function testStates() {
-            const url = API_BASE + "/states";
+            // USING RELATIVE PATH DIRECTLY
+            const url = "/states";
             document.getElementById("requestUrl").innerText = "GET " + url;
             document.getElementById("jsonOutput").innerText = "Fetching...";
             
@@ -83,7 +81,7 @@
                 const data = await res.json();
                 document.getElementById("jsonOutput").innerHTML = syntaxHighlight(data);
             } catch (err) {
-                document.getElementById("jsonOutput").innerText = "Error: " + err.message + "\n(Make sure uvicorn is running!)";
+                document.getElementById("jsonOutput").innerText = "Error: " + err.message + "\n(Make sure the API is running!)";
             }
         }
 
@@ -91,7 +89,8 @@
             const state = document.getElementById("stateInput").value;
             if (!state) return;
             
-            const url = API_BASE + "/forecast/" + encodeURIComponent(state);
+            // USING RELATIVE PATH DIRECTLY
+            const url = "/forecast/" + encodeURIComponent(state);
             document.getElementById("requestUrl").innerText = "GET " + url;
             document.getElementById("jsonOutput").innerText = "Fetching...";
             
@@ -100,7 +99,7 @@
                 const data = await res.json();
                 document.getElementById("jsonOutput").innerHTML = syntaxHighlight(data);
             } catch (err) {
-                document.getElementById("jsonOutput").innerText = "Error: " + err.message + "\n(Make sure uvicorn is running!)";
+                document.getElementById("jsonOutput").innerText = "Error: " + err.message + "\n(Make sure the API is running!)";
             }
         }
     </script>
