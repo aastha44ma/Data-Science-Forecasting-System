@@ -43,7 +43,7 @@ A production-grade forecasting engine designed to predict 8-week sales trends ac
 ## ⚡ Execution Guide
 
 ### 1. Training & Selection
-The [train.py](https://github.com/veena-madhuri123/Data-Science-end-to-end-Time-Series-Forecasting-System-with-API-/blob/main/train.py) script handles the heavy lifting. It splits data using time-series logic (preventing data leakage), trains the four mandatory models, and benchmarks them.
+The [train.py] script handles the heavy lifting. It splits data using time-series logic (preventing data leakage), trains the four mandatory models, and benchmarks them.
 ```bash
 python train.py
 ```
@@ -70,13 +70,7 @@ The system uses a **Time-Series Holdout Validation** strategy. For each state, t
 ---
 
 ## 👤 Author
-**[Your Name]**
-* **Role:** GDG On Campus Organizer | Microsoft Gold Ambassador
+**Aastha Malviya**
 * **Focus:** AI/ML, Cloud Architecture, & Open Source
 
 ---
-
-### Pro-Tip for the Apprenticeship:
-When you record your video, emphasize that you used **XGBoost with manual lag features** and **LSTM** to show you can handle both traditional and modern deep learning approaches. This "Hybrid" knowledge is what recruiters look for!
-
-How does this look? If you want, I can also draft a short script for your video to go along with this.
