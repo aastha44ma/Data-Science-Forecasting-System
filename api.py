@@ -15,8 +15,8 @@ cache = {
     "registry": None
 }
 
-PREDICTIONS_PATH = 'artifacts/future_predictions.csv'
-MODELS_REGISTRY_PATH = 'artifacts/best_models_registry.pkl'
+PREDICTIONS_PATH = 'future_predictions.csv'
+MODELS_REGISTRY_PATH = 'best_models_registry.pkl'
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
